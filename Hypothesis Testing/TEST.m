@@ -1,0 +1,44 @@
+I = 20;  % The number of the initial values;
+K = 200; % The number of the simulated datasets;
+N = 500; % The sample size;
+mu = [1,1]; sigma = [0.5,0;0,0.5];
+% The mean and covariance of the simulated d-dimensional covariate vector X;
+beta = [0.8,0]'; % beta = [0.1,0]';
+theta = [0,1,1]'; Initial_lambda = 1; alpha = 1;
+% The beta, theta, lambda, and alpha in the proposed mixture regression model;
+epsilon = 0.0001;
+% The setting tolerance to check whether stop the EM iteration;
+T = 500; % The maximum of EM iterations;
+[beta_dim, ~] = size(beta); % beta_dim -- The dimension of beta;
+n = 2 + beta_dim;  n_add_one = n + 1;
+Para_num = 7; % The number of unknown parameters;
+lb_lambda = 0; ub_lambda = 1; lb_alpha = 1; ub_alpha = 10;
+lb_beta = -5; ub_beta = 5; lb_theta = -5; ub_theta = 5;
+% lb_lambda - The lower bound of the uniform distribution for the initial value of lambda;
+% ub_lambda - The upper bound of the uniform distribution for the initial value of lambda;
+% lb_alpha - The lower bound of the uniform distribution for the initial value of alpha;
+% ub_alpha - The upper bound of the uniform distribution for the initial value of alpha;
+% lb_beta - The lower bound of the uniform distribution for the initial value of each component of beta;
+% ub_beta - The upper bound of the uniform distribution for the initial value of each component of beta;
+% lb_theta - The lower bound of the uniform distribution for the initial value of each component of theta;
+% ub_theta - The upper bound of the uniform distribution for the initial value of each component of theta;
+bound_vector = [lb_lambda, ub_lambda, lb_alpha, ub_alpha, lb_beta,ub_beta, lb_theta, ub_theta];
+SimulationData = Data_Generator( N,K,Initial_lambda,alpha,beta,theta,mu,sigma );
+t_start=tic;
+[ Likelihood1 ] = Hypothesis_Test1( SimulationData,bound_vector, K, I, epsilon, T, N, n, n_add_one, Para_num);
+[ Likelihood2 ] = Hypothesis_Test2( SimulationData,bound_vector, K, I, epsilon, T, N, n, n_add_one, Para_num);
+[ Likelihood3 ] = Hypothesis_Test3( SimulationData,bound_vector, K, I, epsilon, T, N, n, n_add_one, Para_num);
+[ Likelihood4 ] = Hypothesis_Test4( SimulationData,bound_vector, K, I, epsilon, T, N, n, n_add_one, Para_num);
+toc(t_start);
+Test2 = 2*((Likelihood1)-(Likelihood2));
+p2=chi2cdf(Test2,2,'upper');
+R2=(p2<=0.05);
+mean(R2)
+Test3 = 2*((Likelihood1)-(Likelihood3));
+p3=chi2cdf(Test3,1,'upper');
+R3=(p3<=0.05);
+mean(R3)
+Test4 = 2*((Likelihood1)-(Likelihood4));
+p4=chi2cdf(Test4,1,'upper');
+R4=(p4<=0.05);
+mean(R4)
